@@ -8,27 +8,20 @@ class HomeService {
 
   final HomeRepository repository;
 
-  List<Map<String, dynamic>> _convertPathDataToJson(
-      List<PathData> pathDataList) {
-    return pathDataList.map((pathData) {
-      return {
-        "id": pathData.id,
-        "result": {
-          "steps": [
-            {
-              "x": pathData.start.x.toString(),
-              "y": pathData.start.y.toString(),
-            },
-            {
-              "x": pathData.end.x.toString(),
-              "y": pathData.end.y.toString(),
-            }
-          ],
-          "path":
-              "(${pathData.start.x},${pathData.start.y})->(${pathData.end.x},${pathData.end.y})",
-        },
-      };
-    }).toList();
+  Map<String, dynamic> _convertPathDataToJson(
+      CalculationResult calculationResult) {
+    return {
+      "id": calculationResult.id,
+      "result": {
+        "steps": calculationResult.result.steps
+            .map((coordinate) => {
+                  "x": coordinate.x,
+                  "y": coordinate.y,
+                })
+            .toList(),
+        "path": calculationResult.result.path,
+      },
+    };
   }
 
   List<CalculationResult> getListPaths(List<PathData> pathDataList) {
@@ -51,7 +44,9 @@ class HomeService {
   Future<ResponsePathData?> getPath(String url) async =>
       await repository.getPath(url);
 
-  // Future<void> getCalculatePath(List<PathData> pathDataList) {
-  //   await repository.getCalculatePath(_convertPathDataToJson(pathDataList));
-  // }
+  Future<CalculationResponse?> getCalculationResult(
+      CalculationResult calculationResult) async {
+    return await repository
+        .sendCalculationResult(_convertPathDataToJson(calculationResult));
+  }
 }

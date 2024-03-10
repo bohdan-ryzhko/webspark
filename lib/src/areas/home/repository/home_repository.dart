@@ -27,4 +27,25 @@ class HomeRepository {
       return null;
     }
   }
+
+  Future<CalculationResponse?> sendCalculationResult(
+      Map<String, dynamic> data) async {
+    try {
+      debugPrint([data].toString());
+      final response = await dio.post('$baseUrl$endPoint', data: [data]);
+
+      debugPrint(response.toString());
+
+      return CalculationResponse(
+        error: response.data['error'],
+        message: response.data['message'],
+        data: (response.data['data'] as List<dynamic>)
+            .map((item) => CalculationData.fromJson(item))
+            .toList(),
+      );
+    } catch (error) {
+      debugPrint(error.toString());
+      return null;
+    }
+  }
 }

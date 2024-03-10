@@ -7,8 +7,10 @@ class HomeScreenController with ChangeNotifier {
     required this.service,
     AsyncSnapshot<ResponsePathData?> path = const AsyncSnapshot.nothing(),
     List<CalculationResult> pathsList = const [],
+    AsyncSnapshot calculationPath = const AsyncSnapshot.nothing(),
   })  : _path = path,
-        _pathsList = pathsList;
+        _pathsList = pathsList,
+        _calculationPath = calculationPath;
 
   final HomeService service;
 
@@ -30,8 +32,49 @@ class HomeScreenController with ChangeNotifier {
     notifyListeners();
   }
 
-  void resetPath() {
-    _path = const AsyncSnapshot.nothing();
+  AsyncSnapshot _calculationPath;
+  AsyncSnapshot get calculationPath => _calculationPath;
+
+  Future<void> loadCalculationResult(
+    CalculationResult calculationResult,
+    BuildContext context,
+  ) async {
+    _calculationPath = const AsyncSnapshot.waiting();
+    notifyListeners();
+
+    final response = await service.getCalculationResult(calculationResult);
+
+    if (response == null) {
+      _calculationPath =
+          const AsyncSnapshot.withData(ConnectionState.active, null);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: SizedBox(
+            height: 50,
+            child: Text(
+              "Result was not sent, please try again later",
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+          backgroundColor: Color.fromARGB(255, 153, 36, 27),
+        ),
+      );
+    } else {
+      _calculationPath = AsyncSnapshot.withData(ConnectionState.done, response);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: SizedBox(
+            height: 50,
+            child: Text(
+              "Send result success!",
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+          backgroundColor: Color.fromARGB(255, 96, 146, 32),
+        ),
+      );
+    }
+
     notifyListeners();
   }
 
@@ -40,6 +83,11 @@ class HomeScreenController with ChangeNotifier {
 
   void loadPathsList() {
     _pathsList = service.getListPaths(path.data!.data);
+    notifyListeners();
+  }
+
+  void resetPath() {
+    _path = const AsyncSnapshot.nothing();
     notifyListeners();
   }
 }

@@ -1,3 +1,32 @@
+class CalculationResponse {
+  CalculationResponse({
+    required this.error,
+    required this.message,
+    required this.data,
+  });
+
+  final bool error;
+  final String message;
+  final List<CalculationData> data;
+}
+
+class CalculationData {
+  CalculationData({
+    required this.id,
+    required this.correct,
+  });
+
+  final String id;
+  final bool correct;
+
+  factory CalculationData.fromJson(Map<String, dynamic> json) {
+    return CalculationData(
+      id: json['id'] ?? '',
+      correct: json['correct'] ?? false,
+    );
+  }
+}
+
 class CalculationResult {
   const CalculationResult({
     required this.id,

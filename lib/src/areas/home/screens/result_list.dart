@@ -31,7 +31,7 @@ class ResultList extends StatelessWidget {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => PreviewScreen(
-                          result: homeController.pathsList[index].result,
+                          calculationResult: homeController.pathsList[index],
                         ),
                       ),
                     );
